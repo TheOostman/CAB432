@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "test": "vitest run",
-    "dev:cloud": "nodemon src/server.cloud.js"
+    "dev:cloud": "npx nodemon src/server.cloud.js",
+    "start": "node src/server.cloud.js"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.896.0",
