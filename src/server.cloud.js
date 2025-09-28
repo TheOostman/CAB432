@@ -19,10 +19,6 @@ app.use(rateLimit({ windowMs: 60_000, max: 60 }));
 const PORT = process.env.PORT || 3000;
 const ownerFromRequest = () => "demo-user"; // will use Cognito "sub" in Step 2
 
-app.listen(process.env.PORT || 3000, "0.0.0.0", () => {
-  console.log("server up");
-});
-
 app.get("/health", (req, res) => res.json({ ok: true }));
 
 app.post("/render", async (req, res) => {
