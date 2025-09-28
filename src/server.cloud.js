@@ -8,8 +8,6 @@ import { PassThrough } from "stream";
 import { S3KeyFor, uploadPdfStreamToS3, getDownloadUrl } from "./storage/s3.js";
 import { putDoc, putJob, getJob } from "./storage/dynamo.js";
 
-
-
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -17,9 +15,12 @@ app.use(express.static("public"));
 app.use(rateLimit({ windowMs: 60_000, max: 60 }));
 
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || "0.0.0.0";
+
 const ownerFromRequest = () => "demo-user"; // will use Cognito "sub" in Step 2
 
-app.get("/health", (req, res) => res.json({ ok: true }));
+// Health check route
+app.get("/health", (req, res) => res.status(200).send("OK"));
 
 app.post("/render", async (req, res) => {
   try {
@@ -29,7 +30,7 @@ app.post("/render", async (req, res) => {
 
     const docId = uuid();
     const jobId = uuid();
-    const key = s3KeyFor("renders", jobId);
+    const key = S3KeyFor("renders", jobId);  // fixed casing
     const createdAt = new Date().toISOString();
 
     const pdf = new PDFDocument({ autoFirstPage: false });
@@ -39,7 +40,7 @@ app.post("/render", async (req, res) => {
     for (let i = 0; i < pages; i++) {
       pdf.addPage();
       pdf.fontSize(24).text(title, 72, 72);
-      pdf.moveDown().fontSize(14).text(`${body} (page ${i+1}/${pages})`, { width: 468 });
+      pdf.moveDown().fontSize(14).text(`${body} (page ${i + 1}/${pages})`, { width: 468 });
     }
     pdf.pipe(pipe);
     pdf.end();
@@ -62,5 +63,6 @@ app.get("/jobs/:id", async (req, res) => {
   res.json(job);
 });
 
-app.listen(PORT, () => console.log(`Cloud server :${PORT}`));
-
+app.listen(PORT, HOST, () => {
+  console.log(`Cloud server listening on http://${HOST}:${PORT}`);
+});
