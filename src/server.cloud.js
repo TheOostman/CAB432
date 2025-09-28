@@ -1,4 +1,3 @@
-cat > src/server.cloud.js <<'EOF'
 import express from "express";
 import "dotenv/config";
 import PDFDocument from "pdfkit";
@@ -6,8 +5,10 @@ import { v4 as uuid } from "uuid";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import { PassThrough } from "stream";
-import { s3KeyFor, uploadPdfStreamToS3, getDownloadUrl } from "./storage/s3.js";
+import { S3KeyFor, uploadPdfStreamToS3, getDownloadUrl } from "./storage/s3.js";
 import { putDoc, putJob, getJob } from "./storage/dynamo.js";
+
+
 
 const app = express();
 app.use(express.json());
@@ -17,6 +18,10 @@ app.use(rateLimit({ windowMs: 60_000, max: 60 }));
 
 const PORT = process.env.PORT || 3000;
 const ownerFromRequest = () => "demo-user"; // will use Cognito "sub" in Step 2
+
+app.listen(process.env.PORT || 3000, "0.0.0.0", () => {
+  console.log("server up");
+});
 
 app.get("/health", (req, res) => res.json({ ok: true }));
 
@@ -62,4 +67,4 @@ app.get("/jobs/:id", async (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Cloud server :${PORT}`));
-EOF
+
