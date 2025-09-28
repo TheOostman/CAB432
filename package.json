@@ -1,10 +1,10 @@
 {
   "name": "pdf-forge",
-  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "nodemon src/server.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "dev:cloud": "nodemon src/server.cloud.js"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.896.0",
